@@ -140,6 +140,15 @@
             cursor: pointer;
             position: relative;
             z-index: 1;
+            transition: transform 0.2s ease;
+        }
+
+        .chart-box canvas:hover {
+            transform: scale(1.02);
+        }
+
+        .chart-box:hover {
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
         }
 
         .chart-box {
@@ -1302,18 +1311,84 @@
                 Object.entries(charts).forEach(([name, chart]) => {
                     if (chart && chart.options && chart.options.onClick) {
                         console.log(`✓ ${name} chart has onClick handler`);
+
+                        // Test interaction configuration
+                        if (chart.options.interaction) {
+                            console.log(`✓ ${name} chart has interaction config:`, chart.options.interaction);
+                        } else {
+                            console.log(`⚠ ${name} chart missing interaction config`);
+                        }
+
+                        // Test hover handler
+                        if (chart.options.onHover) {
+                            console.log(`✓ ${name} chart has onHover handler`);
+                        } else {
+                            console.log(`⚠ ${name} chart missing onHover handler`);
+                        }
+
+                        // Test legend click handler
+                        if (chart.options.plugins && chart.options.plugins.legend && chart.options.plugins.legend.onClick) {
+                            console.log(`✓ ${name} chart has legend onClick handler`);
+                        } else {
+                            console.log(`⚠ ${name} chart missing legend onClick handler`);
+                        }
                     } else {
                         console.log(`✗ ${name} chart missing onClick handler`);
                     }
                 });
 
                 console.log('Chart interactivity test complete. Click on chart elements to test functionality.');
+                console.log('Expected behaviors:');
+                console.log('- Issue Type Chart: Click segments or legend to filter by type');
+                console.log('- Status Chart: Click bars to filter by status');
+                console.log('- Priority Chart: Click segments or legend to filter by priority');
+                console.log('- Resolution Time Chart: Click bars to show resolved tickets by type');
             };
 
             // Add modal test function for debugging
             window.testModal = function() {
                 console.log('Testing modal functionality...');
                 showModal('Test Modal', '<p>This is a test modal. If you can see this, the modal system is working!</p>');
+            };
+
+            // Add comprehensive chart interaction test
+            window.testAllChartInteractions = function() {
+                console.log('🧪 Testing all chart interactions...');
+
+                // Test show functions exist
+                const showFunctions = [
+                    'showAllTickets', 'showOpenTickets', 'showResolvedTickets',
+                    'showTicketsByStatus', 'showTicketsByType', 'showTicketsByPriority',
+                    'showTicketsByAssignee', 'showResolvedTicketsByType'
+                ];
+
+                showFunctions.forEach(funcName => {
+                    if (typeof window[funcName] === 'function') {
+                        console.log(`✅ ${funcName} function exists`);
+                    } else {
+                        console.error(`❌ ${funcName} function missing`);
+                    }
+                });
+
+                // Test chart canvas elements exist
+                const chartIds = ['issueTypeChart', 'statusChart', 'priorityChart', 'resolutionTimeChart'];
+                chartIds.forEach(id => {
+                    const canvas = document.getElementById(id);
+                    if (canvas) {
+                        console.log(`✅ ${id} canvas element exists`);
+                        const style = window.getComputedStyle(canvas);
+                        if (style.cursor === 'pointer') {
+                            console.log(`✅ ${id} has pointer cursor`);
+                        } else {
+                            console.warn(`⚠️ ${id} missing pointer cursor`);
+                        }
+                    } else {
+                        console.error(`❌ ${id} canvas element missing`);
+                    }
+                });
+
+                console.log('🎯 Chart interaction test complete!');
+                console.log('💡 Try clicking on chart elements to test functionality');
             };
         });
 
@@ -3160,6 +3235,10 @@ What would you like to explore about your ${allTickets ? allTickets.length : 0} 
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
+                    interaction: {
+                        mode: 'nearest',
+                        intersect: true
+                    },
                     onClick: (event, elements) => {
                         console.log('Issue Type Chart clicked:', elements);
                         if (elements.length > 0) {
@@ -3169,12 +3248,33 @@ What would you like to explore about your ${allTickets ? allTickets.length : 0} 
                             showTicketsByType(type);
                         }
                     },
+                    onHover: (event, elements) => {
+                        event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+                    },
                     plugins: {
                         legend: {
                             position: 'bottom',
                             labels: {
                                 padding: 15,
                                 color: '#a8a8b3'
+                            },
+                            onClick: (event, legendItem, legend) => {
+                                const index = legendItem.index;
+                                const type = Object.keys(data)[index];
+                                console.log('Legend clicked for type:', type);
+                                showTicketsByType(type);
+                            }
+                        },
+                        tooltip: {
+                            enabled: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
                             }
                         }
                     }
@@ -3198,6 +3298,10 @@ What would you like to explore about your ${allTickets ? allTickets.length : 0} 
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
+                    interaction: {
+                        mode: 'nearest',
+                        intersect: true
+                    },
                     onClick: (event, elements) => {
                         console.log('Status Chart clicked:', elements);
                         if (elements.length > 0) {
@@ -3207,9 +3311,22 @@ What would you like to explore about your ${allTickets ? allTickets.length : 0} 
                             showTicketsByStatus(status);
                         }
                     },
+                    onHover: (event, elements) => {
+                        event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+                    },
                     plugins: {
                         legend: {
                             display: false
+                        },
+                        tooltip: {
+                            enabled: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed.y || 0;
+                                    return `${label}: ${value} tickets`;
+                                }
+                            }
                         }
                     },
                     scales: {
@@ -3217,11 +3334,17 @@ What would you like to explore about your ${allTickets ? allTickets.length : 0} 
                             beginAtZero: true,
                             grid: {
                                 color: '#2a2a4e'
+                            },
+                            ticks: {
+                                color: '#a8a8b3'
                             }
                         },
                         x: {
                             grid: {
                                 display: false
+                            },
+                            ticks: {
+                                color: '#a8a8b3'
                             }
                         }
                     }
@@ -3250,6 +3373,10 @@ What would you like to explore about your ${allTickets ? allTickets.length : 0} 
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
+                    interaction: {
+                        mode: 'nearest',
+                        intersect: true
+                    },
                     onClick: (event, elements) => {
                         console.log('Priority Chart clicked:', elements);
                         if (elements.length > 0) {
@@ -3259,11 +3386,33 @@ What would you like to explore about your ${allTickets ? allTickets.length : 0} 
                             showTicketsByPriority(priority);
                         }
                     },
+                    onHover: (event, elements) => {
+                        event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+                    },
                     plugins: {
                         legend: {
                             position: 'bottom',
                             labels: {
-                                padding: 15
+                                padding: 15,
+                                color: '#a8a8b3'
+                            },
+                            onClick: (event, legendItem, legend) => {
+                                const index = legendItem.index;
+                                const priority = Object.keys(data)[index];
+                                console.log('Legend clicked for priority:', priority);
+                                showTicketsByPriority(priority);
+                            }
+                        },
+                        tooltip: {
+                            enabled: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
                             }
                         }
                     }
@@ -3299,6 +3448,10 @@ What would you like to explore about your ${allTickets ? allTickets.length : 0} 
                     indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: true,
+                    interaction: {
+                        mode: 'nearest',
+                        intersect: true
+                    },
                     onClick: (event, elements) => {
                         console.log('Resolution Time Chart clicked:', elements);
                         if (elements.length > 0) {
@@ -3308,9 +3461,22 @@ What would you like to explore about your ${allTickets ? allTickets.length : 0} 
                             showResolvedTicketsByType(type);
                         }
                     },
+                    onHover: (event, elements) => {
+                        event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+                    },
                     plugins: {
                         legend: {
                             display: false
+                        },
+                        tooltip: {
+                            enabled: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed.x || 0;
+                                    return `${label}: ${value.toFixed(1)} days`;
+                                }
+                            }
                         }
                     },
                     scales: {
@@ -3318,11 +3484,17 @@ What would you like to explore about your ${allTickets ? allTickets.length : 0} 
                             beginAtZero: true,
                             grid: {
                                 color: '#2a2a4e'
+                            },
+                            ticks: {
+                                color: '#a8a8b3'
                             }
                         },
                         y: {
                             grid: {
                                 display: false
+                            },
+                            ticks: {
+                                color: '#a8a8b3'
                             }
                         }
                     }
