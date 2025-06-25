@@ -28,6 +28,20 @@ app.use(cookieParser());
 // Serve static files
 app.use(express.static(path.dirname(__filename)));
 
+// Root route - redirect to dashboard
+app.get('/', (req, res) => {
+    res.redirect('/custengg-dashboard-enhanced.html');
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        version: '1.0.0'
+    });
+});
+
 // Proxy endpoint for Jira API
 app.post('/api/jira-proxy', async (req, res) => {
     let { baseUrl, username, apiToken, endpoint, params } = req.body;
