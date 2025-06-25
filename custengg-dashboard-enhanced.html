@@ -514,6 +514,47 @@
             width: 100%;
         }
 
+        .project-key-header {
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .floating-projects-btn {
+            position: absolute;
+            top: -2px;
+            right: 0;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 3px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            box-shadow: 0 1px 3px rgba(102, 126, 234, 0.3);
+            z-index: 10;
+        }
+
+        .floating-projects-btn:hover {
+            background: #5a67d8;
+            transform: scale(1.15);
+            box-shadow: 0 2px 5px rgba(102, 126, 234, 0.4);
+        }
+
+        .floating-projects-btn:active {
+            transform: scale(0.9);
+        }
+
+        .floating-projects-btn svg {
+            width: 10px;
+            height: 10px;
+        }
+
         .autocomplete-input {
             width: 100%;
             padding: 8px 12px;
@@ -688,7 +729,7 @@
         .config-grid-button-row {
             grid-column: 1 / -1;
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 15px;
             margin-top: 15px;
             width: 100%;
@@ -704,15 +745,15 @@
             text-overflow: ellipsis;
         }
 
-        /* Responsive button layout - 2x2 grid for medium screens */
+        /* Responsive button layout - 3x1 for medium screens, then 1x3 for small */
         @media (max-width: 900px) {
             .config-grid-button-row {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(3, 1fr);
                 gap: 12px;
             }
         }
 
-        /* Responsive button layout - 1x4 grid for small screens */
+        /* Responsive button layout - 1x3 grid for small screens */
         @media (max-width: 480px) {
             .config-grid-button-row {
                 grid-template-columns: 1fr;
@@ -1086,19 +1127,25 @@
                     <div id="tokenStatus" style="display: none; margin-top: 5px; color: #667eea; font-size: 0.8em;"></div>
                 </div>
                 <div class="config-form-field">
-                    <label for="projectKey">Project Key:</label>
+                    <div class="project-key-header">
+                        <label for="projectKey">Project Key:</label>
+                        <button type="button" class="floating-projects-btn" onclick="showProjectListModal()" title="List Available Projects">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+                            </svg>
+                        </button>
+                    </div>
                     <div class="autocomplete-container">
                         <input type="text" id="projectKey" class="autocomplete-input" value="" placeholder="Start typing to search projects..." required>
                         <div id="projectDropdown" class="autocomplete-dropdown"></div>
                     </div>
-                    <small>Start typing to search available projects, or click "List Available Projects" to load all options</small>
+                    <small>Start typing to search available projects, or click the list icon to browse all options</small>
                 </div>
             </div>
 
             <!-- Row 3: All Action Buttons -->
             <div class="config-grid-button-row">
                 <button type="submit" class="load-data-btn">Load Data</button>
-                <button type="button" onclick="showProjectListModal()">List Available Projects</button>
                 <button type="button" id="credentialsToggle" class="credentials-toggle off" onclick="toggleCredentialsSaving()">Save Credentials</button>
                 <button type="button" onclick="clearStoredCredentials()" style="background: #a02020;">Clear Stored Credentials</button>
             </div>
