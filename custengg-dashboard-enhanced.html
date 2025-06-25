@@ -514,45 +514,19 @@
             width: 100%;
         }
 
-        .project-key-header {
-            position: relative;
-            margin-bottom: 8px;
-        }
-
-        .floating-projects-btn {
-            position: absolute;
-            top: -2px;
-            right: 0;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            padding: 3px;
+        .view-all-projects-link {
+            font-style: italic;
+            color: #888;
+            font-size: 0.9em;
             cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 18px;
-            height: 18px;
-            font-size: 10px;
-            box-shadow: 0 1px 3px rgba(102, 126, 234, 0.3);
-            z-index: 10;
+            transition: color 0.2s ease;
+            text-decoration: none;
+            font-weight: normal;
         }
 
-        .floating-projects-btn:hover {
-            background: #5a67d8;
-            transform: scale(1.15);
-            box-shadow: 0 2px 5px rgba(102, 126, 234, 0.4);
-        }
-
-        .floating-projects-btn:active {
-            transform: scale(0.9);
-        }
-
-        .floating-projects-btn svg {
-            width: 10px;
-            height: 10px;
+        .view-all-projects-link:hover {
+            color: #667eea;
+            text-decoration: underline;
         }
 
         .autocomplete-input {
@@ -1127,19 +1101,12 @@
                     <div id="tokenStatus" style="display: none; margin-top: 5px; color: #667eea; font-size: 0.8em;"></div>
                 </div>
                 <div class="config-form-field">
-                    <div class="project-key-header">
-                        <label for="projectKey">Project Key:</label>
-                        <button type="button" class="floating-projects-btn" onclick="showProjectListModal()" title="List Available Projects">
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
-                            </svg>
-                        </button>
-                    </div>
+                    <label for="projectKey">Project Key: <span class="view-all-projects-link" onclick="showProjectListModal()">(view all projects)</span></label>
                     <div class="autocomplete-container">
                         <input type="text" id="projectKey" class="autocomplete-input" value="" placeholder="Start typing to search projects..." required>
                         <div id="projectDropdown" class="autocomplete-dropdown"></div>
                     </div>
-                    <small>Start typing to search available projects, or click the list icon to browse all options</small>
+                    <small>Start typing to search available projects, or click "view all projects" to browse all options</small>
                 </div>
             </div>
 
