@@ -113,12 +113,23 @@ app.post('/api/openai-proxy', async (req, res) => {
     });
 
     try {
-        const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+        // Prepare request body with model-specific parameters
+        const requestBody = {
             model,
             messages,
-            max_tokens: 2000,
             temperature: 0.7
-        }, {
+        };
+
+        // Use correct token parameter based on model
+        if (model && (model.startsWith('o3') || model.startsWith('o1'))) {
+            // o3 and o1 models use max_completion_tokens
+            requestBody.max_completion_tokens = 2000;
+        } else {
+            // Other models use max_tokens
+            requestBody.max_tokens = 2000;
+        }
+
+        const response = await axios.post('https://api.openai.com/v1/chat/completions', requestBody, {
             headers: {
                 'Authorization': `Bearer ${apiKey}`,
                 'Content-Type': 'application/json'
