@@ -109,25 +109,36 @@ app.post('/api/openai-proxy', async (req, res) => {
 
     console.log('OpenAI proxy request received:', {
         model,
-        messageCount: messages?.length
+        messageCount: messages?.length,
+        isReasoningModel: model && (model.startsWith('o3') || model.startsWith('o1') || model.startsWith('o4'))
     });
 
     try {
         // Prepare request body with model-specific parameters
         const requestBody = {
             model,
-            messages,
-            temperature: 0.7
+            messages
         };
 
-        // Use correct token parameter based on model
-        if (model && (model.startsWith('o3') || model.startsWith('o1'))) {
-            // o3 and o1 models use max_completion_tokens
+        // Check if this is a reasoning model (o3, o1 series)
+        const isReasoningModel = model && (
+            model.startsWith('o3') ||
+            model.startsWith('o1') ||
+            model.startsWith('o4')
+        );
+
+        if (isReasoningModel) {
+            // Reasoning models (o3, o1, o4) have specific requirements:
+            // - Use max_completion_tokens instead of max_tokens
+            // - Don't support temperature, top_p, or other sampling parameters
             requestBody.max_completion_tokens = 2000;
         } else {
-            // Other models use max_tokens
+            // Standard models (GPT-4, GPT-3.5, etc.) use regular parameters
             requestBody.max_tokens = 2000;
+            requestBody.temperature = 0.7;
         }
+
+        console.log('Sending request to OpenAI with parameters:', Object.keys(requestBody));
 
         const response = await axios.post('https://api.openai.com/v1/chat/completions', requestBody, {
             headers: {
