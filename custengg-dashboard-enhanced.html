@@ -474,6 +474,25 @@
             color: white !important;
         }
 
+        /* AI Analysis button with same orange styling and pulsing glow */
+        .ai-analysis-btn {
+            background: #ff8c00 !important;
+            color: white !important;
+            border: 1px solid rgba(255, 140, 0, 0.5) !important;
+            box-shadow:
+                0 0 20px rgba(255, 140, 0, 0.6),
+                0 0 40px rgba(255, 140, 0, 0.4),
+                0 0 60px rgba(255, 140, 0, 0.2) !important;
+            animation: pulseGlow 2.5s ease-in-out infinite;
+            position: relative;
+            overflow: visible;
+        }
+
+        .ai-analysis-btn:hover {
+            background: #ffaa33 !important;
+            color: white !important;
+        }
+
         /* Pulsing glow animation */
         @keyframes pulseGlow {
             0% {
@@ -500,7 +519,8 @@
 
         /* Accessibility: Respect user's motion preferences */
         @media (prefers-reduced-motion: reduce) {
-            .load-data-btn {
+            .load-data-btn,
+            .ai-analysis-btn {
                 animation: none !important;
                 box-shadow: 0 0 20px rgba(255, 140, 0, 0.6) !important;
             }
@@ -1146,7 +1166,7 @@
 
             <!-- Row 2: AI Action Buttons -->
             <div class="ai-config-button-row">
-                <button type="button" onclick="startAIAnalysisChat()" id="analyzeButton">Start AI Analysis Chat</button>
+                <button type="button" onclick="startAIAnalysisChat()" id="analyzeButton" class="ai-analysis-btn">Start AI Analysis Chat</button>
                 <button type="button" id="aiCredentialsToggle" class="credentials-toggle off" onclick="toggleAICredentialsSaving()">Save Credentials</button>
                 <button type="button" onclick="clearAIStoredCredentials()" style="background: #a02020;">Clear Stored Credentials</button>
             </div>
